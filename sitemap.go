@@ -2,14 +2,16 @@ package sitemap
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
 const (
-	header      = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
-	footer      = `</urlset>`
+	header      = `<?xml version="1.0" encoding="UTF-8"?>`
+	baseOpen    = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"%s>`
+	baseClose   = `</urlset>`
 	indexHeader = `<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
 	indexFooter = `</sitemapindex>`
 	tmpExt      = `.xml.tmp`
@@ -28,6 +30,8 @@ type Options struct {
 	Dir string
 	// BaseURL used for generate sitemap index file
 	BaseURL string
+	// XML Namespaces
+	XMLns map[string]string
 }
 
 // New constructs a new Generator instance with the supplied options.
@@ -58,6 +62,8 @@ type Generator struct {
 	maxBodyLen int
 	// temp file
 	tmpFile *os.File
+	// generated header (with namespace)
+	header string
 }
 
 // Open drops internal counters and checks you generator options
@@ -65,7 +71,8 @@ func (g *Generator) Open() (err error) {
 	if g.opt.MaxFileSize == 0 {
 		g.opt.MaxFileSize = 10485760
 	}
-	g.maxBodyLen = g.opt.MaxFileSize - len(header) - len(footer)
+	g.GenerateHeader()
+	g.maxBodyLen = g.opt.MaxFileSize - len(g.header) - len(baseClose)
 	if g.maxBodyLen <= 0 {
 		return errors.New("invalid MaxFileSize option value")
 	}
@@ -89,6 +96,15 @@ func (g *Generator) Open() (err error) {
 	}
 	g.fileCount = 0
 	return g.createTmp()
+}
+
+// Generate head
+func (g *Generator) GenerateHeader() {
+	ns := ""
+	for k, v := range g.opt.XMLns {
+		ns = ns + " " + k + `="` + v + `"`
+	}
+	g.header = header + fmt.Sprintf(baseOpen, ns)
 }
 
 // Close finishes generation process, all temp files will removed
@@ -163,7 +179,7 @@ func (g *Generator) createTmp() (err error) {
 	if err != nil {
 		return err
 	}
-	_, err = g.tmpFile.Write([]byte(header))
+	_, err = g.tmpFile.Write([]byte(g.header))
 	return err
 }
 
@@ -206,7 +222,7 @@ func (g *Generator) closeAndRenameTmp() error {
 	if g.tmpFile == nil {
 		return errors.New("trying to close empty tmp file")
 	}
-	if _, err := g.tmpFile.Write([]byte(footer)); err != nil {
+	if _, err := g.tmpFile.Write([]byte(baseClose)); err != nil {
 		return err
 	}
 	tmpPath := g.tmpFile.Name()

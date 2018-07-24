@@ -2,10 +2,11 @@ package sitemap
 
 import (
 	"github.com/stretchr/testify/require"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"testing"
-	"io/ioutil"
 )
 
 const tmpDir = `testdata`
@@ -73,7 +74,7 @@ func TestParamChecks(t *testing.T) {
 	err = g.Open()
 	require.Error(t, err)
 
-	opt.MaxFileSize = len(header) + len(footer) + 10
+	opt.MaxFileSize = len(header+baseOpen) + len(baseClose) + 10
 	g = New(opt)
 	err = g.Open()
 	require.Error(t, err)
@@ -84,13 +85,47 @@ func TestParamChecks(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestHeaderChecks(t *testing.T) {
+	var g *Generator
+	checks := [3]string{
+		`xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`,
+		`xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"`,
+		`xmlns:xhtml="http://www.w3.org/1999/xhtml"`,
+	}
+
+	ns := map[string]string{
+		"xmlns:xhtml": "http://www.w3.org/1999/xhtml",
+		"xmlns:image": "http://www.google.com/schemas/sitemap-image/1.1",
+	}
+	opt := Options{
+		Dir:      tmpDir,
+		Filename: "c",
+		BaseURL:  "http://example.com/",
+		XMLns:    ns,
+	}
+	g = New(opt)
+	require.NoError(t, g.Open())
+	require.NoError(t, g.Add(URL{Loc: "test1"}))
+	require.NoError(t, g.Add(URL{Loc: "test2"}))
+	require.NoError(t, g.Close())
+
+	file, _ := ioutil.ReadFile(tmpDir + "/c.xml")
+	for _, check := range checks {
+		regString := "<urlset.*" + check + ".*>.*</urlset>"
+		t.Log("Testing presence of: " + check)
+		res, err := regexp.Match(regString, file)
+		require.NoError(t, err)
+		require.True(t, res)
+	}
+}
+
 func TestInternals(t *testing.T) {
 	var (
 		g   *Generator
 		err error
 	)
 	opt := Options{
-		MaxFileSize: len(header) + len(footer) + 10,
+		MaxFileSize: len(header+baseOpen) - 2 + len(baseClose) + 10,
 		MaxURLs:     2,
 		BaseURL:     "/",
 		Dir:         tmpDir,
