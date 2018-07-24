@@ -14,13 +14,13 @@ import (
 	"github.com/pahanini/go-sitemap-generator"
 )
 
-g := sitemap.New(sitmap.Options{
+g := sitemap.New(sitemap.Options{
 	Dir:         "sitemap",
 	BaseURL:     "http://example.com/",
 })
 g.Open()
-g.Add(sitemap.URL{Location:`http://example.com`, Priority: `0.5`})
-g.Add(sitemap.URL{Location:`http://example.com/test`, Priority: `0.5`})
+g.Add(sitemap.URL{Loc:`http://example.com`, Priority: `0.5`})
+g.Add(sitemap.URL{Loc:`http://example.com/test`, Priority: `0.5`})
 g.Close()
 ```
 

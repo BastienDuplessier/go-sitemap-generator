@@ -39,4 +39,3 @@ func (u URL) SitemapLastMod() string {
 func (u URL) SitemapPriority() string {
 	return u.Priority
 }
-
