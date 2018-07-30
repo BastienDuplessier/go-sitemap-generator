@@ -167,7 +167,29 @@ func (g *Generator) formatURLNode(u SitemapURL) string {
 	if t := u.SitemapPriority(); t != "" {
 		r += `<priority>` + t + `</priority>`
 	}
+	if t := u.SitemapImages(); len(t) > 0 {
+		for _, i := range t {
+			r += g.formatImageNode(i)
+		}
+	}
 	return r + `</url>`
+}
+
+func (g *Generator) formatImageNode(i SitemapImage) string {
+	r := `<image:image><image:loc>` + i.SitemapLoc() + `</image:loc>`
+	if t := i.SitemapCaption(); t != "" {
+		r += `<image:caption>` + t + `</image:caption>`
+	}
+	if t := i.SitemapGeoLoc(); t != "" {
+		r += `<image:geo_location>` + t + `</image:geo_location>`
+	}
+	if t := i.SitemapTitle(); t != "" {
+		r += `<image:title>` + t + `</image:title>`
+	}
+	if t := i.SitemapLicense(); t != "" {
+		r += `<image:license>` + t + `</image:license>`
+	}
+	return r + `</image:image>`
 }
 
 // newTmpFiles creates new tmp file of files (if gzip required)

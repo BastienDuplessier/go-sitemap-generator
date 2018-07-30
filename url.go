@@ -15,6 +15,7 @@ type SitemapURL interface {
 	SitemapChangeFreq() string
 	SitemapLastMod() string
 	SitemapPriority() string
+	SitemapImages() []Image
 }
 
 type URL struct {
@@ -22,6 +23,7 @@ type URL struct {
 	ChangeFreq string
 	LastMod    string
 	Priority   string
+	Images     []Image
 }
 
 func (u URL) SitemapLoc() string {
@@ -38,4 +40,8 @@ func (u URL) SitemapLastMod() string {
 
 func (u URL) SitemapPriority() string {
 	return u.Priority
+}
+
+func (u URL) SitemapImages() []Image {
+	return u.Images
 }

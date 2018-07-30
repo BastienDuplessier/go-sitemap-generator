@@ -142,3 +142,57 @@ func TestInternals(t *testing.T) {
 	n2 := g.formatURLNode(URL{Loc: "test2", ChangeFreq: ChangeFreqDaily})
 	require.Equal(t, `<url><loc>test2</loc><changefreq>daily</changefreq></url>`, n2)
 }
+
+func TestInternalsImages(t *testing.T) {
+	var (
+		g   *Generator
+		err error
+	)
+	ns := map[string]string{
+		"xmlns:image": "http://www.google.com/schemas/sitemap-image/1.1",
+	}
+	opt := Options{
+		Dir:      tmpDir,
+		Filename: "c",
+		BaseURL:  "http://example.com/",
+		XMLns:    ns,
+	}
+
+	g = New(opt)
+	err = g.Open()
+	require.NoError(t, err)
+
+	img1 := Image{Loc: "loc1", Title: "img1"}
+	img2 := Image{
+		Loc:     "loc2",
+		Caption: "image2",
+		GeoLoc:  "somewhere",
+		Title:   "img2",
+		License: "url",
+	}
+
+	n1 := g.formatURLNode(URL{Loc: "test1", Images: []Image{img1}})
+	require.Equal(t, "<url>"+
+		"<loc>test1</loc>"+
+		"<image:image>"+
+		"<image:loc>loc1</image:loc>"+
+		"<image:title>img1</image:title>"+
+		"</image:image>"+
+		"</url>", n1)
+
+	n2 := g.formatURLNode(URL{Loc: "test2", Images: []Image{img1, img2}})
+	require.Equal(t, "<url>"+
+		"<loc>test2</loc>"+
+		"<image:image>"+
+		"<image:loc>loc1</image:loc>"+
+		"<image:title>img1</image:title>"+
+		"</image:image>"+
+		"<image:image>"+
+		"<image:loc>loc2</image:loc>"+
+		"<image:caption>image2</image:caption>"+
+		"<image:geo_location>somewhere</image:geo_location>"+
+		"<image:title>img2</image:title>"+
+		"<image:license>url</image:license>"+
+		"</image:image>"+
+		"</url>", n2)
+}
