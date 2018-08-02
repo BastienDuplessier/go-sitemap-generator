@@ -24,6 +24,33 @@ g.Add(sitemap.URL{Loc:`http://example.com/test`, Priority: `0.5`})
 g.Close()
 ```
 
+If you want to add some images you can use the following
+
+```go
+package main
+
+import (
+	"github.com/pahanini/go-sitemap-generator"
+)
+
+g := sitemap.New(sitemap.Options{
+	Dir:     "sitemap",
+	BaseURL: "http://example.com/",
+	XMLns: map[string]string{
+		"xmlns:image": "http://www.google.com/schemas/sitemap-image/1.1",
+	},
+})
+
+	images := []sitemap.Image{
+	sitemap.Image{
+		Loc:   "http://example.com/image",
+		Title: "Image",
+	}}
+g.Open()
+g.Add(sitemap.URL{Loc: `http://example.com`, Priority: `0.5`, Images: images})
+g.Close()
+```
+
 ## Install
 
 ```console
@@ -48,6 +75,8 @@ type Options struct {
 	Dir string
 	// BaseURL used for generate sitemap index file
 	BaseURL string
+	// XML Namespaces
+	XMLns map[string]string
 }
 ```
 
