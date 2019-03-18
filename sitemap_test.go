@@ -141,6 +141,11 @@ func TestInternals(t *testing.T) {
 
 	n2 := g.formatURLNode(URL{Loc: "test2", ChangeFreq: ChangeFreqDaily})
 	require.Equal(t, `<url><loc>test2</loc><changefreq>daily</changefreq></url>`, n2)
+
+	alternateLinks := []AlternateLink{AlternateLink{Lang: "fr", Url: "test3.1"}}
+	n3 := g.formatURLNode(URL{Loc: "test3", AlternateLinks: alternateLinks})
+	require.Equal(t, `<url><loc>test3</loc><xhtml:link rel="alternate" hreflang="fr" href="test3.1"/></url>`, n3)
+
 }
 
 func TestInternalsImages(t *testing.T) {

@@ -16,14 +16,16 @@ type SitemapURL interface {
 	SitemapLastMod() string
 	SitemapPriority() string
 	SitemapImages() []Image
+	SitemapAlternateLinks() []AlternateLink
 }
 
 type URL struct {
-	Loc        string
-	ChangeFreq string
-	LastMod    string
-	Priority   string
-	Images     []Image
+	Loc            string
+	ChangeFreq     string
+	LastMod        string
+	Priority       string
+	Images         []Image
+	AlternateLinks []AlternateLink
 }
 
 func (u URL) SitemapLoc() string {
@@ -44,4 +46,13 @@ func (u URL) SitemapPriority() string {
 
 func (u URL) SitemapImages() []Image {
 	return u.Images
+}
+
+func (u URL) SitemapAlternateLinks() []AlternateLink {
+	return u.AlternateLinks
+}
+
+type AlternateLink struct {
+	Url  string
+	Lang string
 }

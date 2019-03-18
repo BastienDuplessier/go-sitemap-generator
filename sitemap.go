@@ -172,6 +172,13 @@ func (g *Generator) formatURLNode(u SitemapURL) string {
 			r += g.formatImageNode(i)
 		}
 	}
+	if t := u.SitemapAlternateLinks(); len(t) > 0 {
+		for _, i := range t {
+			r += `<xhtml:link rel="alternate" `
+			r += `hreflang="` + i.Lang + `" `
+			r += `href="` + i.Url + `"/>`
+		}
+	}
 	return r + `</url>`
 }
 
