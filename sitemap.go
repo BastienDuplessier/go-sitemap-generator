@@ -150,6 +150,11 @@ func (g *Generator) Add(url SitemapURL) error {
 	return err
 }
 
+// Return generator current filecount
+func (g *Generator) FileCount() int {
+	return g.fileCount
+}
+
 // canFit returns true if one more node with specified length can be added to file
 func (g *Generator) canFit(nodeLen int) bool {
 	return g.bodyURLCount < g.opt.MaxURLs && g.bodyLen+nodeLen <= g.maxBodyLen
