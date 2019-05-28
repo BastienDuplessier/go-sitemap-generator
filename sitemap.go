@@ -230,9 +230,9 @@ func (g *Generator) createIndex() error {
 		return err
 	}
 	for i := 0; i < g.fileCount; i++ {
-		_, err = f.Write([]byte(`<sitemap><loc>` + g.opt.BaseURL + g.opt.Filename + `-` +
+		_, err = f.Write([]byte(`<sitemap><loc>` + g.opt.BaseURL + g.opt.Filename + `.` +
 			strconv.Itoa(i+1) +
-			ext + `</loc></sitemap>`))
+			ext + `.gz` + `</loc></sitemap>`))
 	}
 	_, err = f.Write([]byte(indexFooter))
 	if err != nil {
@@ -274,7 +274,7 @@ func (g *Generator) closeAndRenameTmp() error {
 func (g *Generator) filename(i int, ext string) string {
 	s := ""
 	if i > 0 {
-		s = "-" + strconv.Itoa(i)
+		s = "." + strconv.Itoa(i)
 	}
 	return filepath.Join(g.opt.Dir, g.opt.Filename+s+ext)
 }
